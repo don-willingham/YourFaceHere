@@ -1,0 +1,3 @@
+Tampa MMF Man.pdf is probably COPYRIGHT Tampa Mini Maker Faire and/or Glazer's Children's Museum
+
+Python source is based on https://github.com/shantnu/Webcam-Face-Detect, which doesn't declare a LICENSE
