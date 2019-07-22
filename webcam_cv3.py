@@ -7,6 +7,7 @@ from time import sleep
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
 log.basicConfig(filename='webcam.log',level=log.INFO)
+maker_man = cv2.imread('Tampa MMF Man.png')
 
 video_capture = cv2.VideoCapture(0)
 anterior = 0
@@ -30,8 +31,26 @@ while True:
     )
 
     # Draw a rectangle around the faces
+    # Find the largest face
+    bigX = -1
+    bigY = -1
+    bigW = -1
+    bigH = -1
     for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        if bigX < 0:
+            bigX = x
+            bigY = y
+            bigW = w
+            bigH = h
+        elif (w * h) > (bigW * bigH):
+            bigX = x
+            bigY = y
+            bigW = w
+            bigH = h
+
+    if bigX > -1:
+        cv2.rectangle(frame, (bigX, bigY), (bigX+bigW, bigY+bigH), (0, 255, 0), 2)
+        #frame = cv2.addWeighted(frame,0.4,maker_man,0.1,0)
 
     if anterior != len(faces):
         anterior = len(faces)
