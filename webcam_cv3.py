@@ -6,6 +6,25 @@ import numpy as np
 from time import sleep
 from PIL import Image
 
+def get_largest_face(faces):
+    # Find the largest face
+    big_x = -1
+    big_y = -1
+    big_w = -1
+    big_h = -1
+    for (x, y, w, h) in faces:
+        if big_x < 0:
+            big_x = x
+            big_y = y
+            big_w = w
+            big_h = h
+        elif (w * h) > (big_w * big_h):
+            big_x = x
+            big_y = y
+            big_w = w
+            big_h = h
+    return(big_x, big_y, big_w, big_h)
+
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
 log.basicConfig(filename='webcam.log',level=log.INFO)
@@ -44,26 +63,12 @@ while True:
 
     # Draw a rectangle around the faces
     # Find the largest face
-    bigX = -1
-    bigY = -1
-    bigW = -1
-    bigH = -1
-    for (x, y, w, h) in faces:
-        if bigX < 0:
-            bigX = x
-            bigY = y
-            bigW = w
-            bigH = h
-        elif (w * h) > (bigW * bigH):
-            bigX = x
-            bigY = y
-            bigW = w
-            bigH = h
+    (big_x, big_y, big_w, big_h) = get_largest_face(faces)
 
-    if bigX > -1:
-        cv2.rectangle(frame, (bigX, bigY), (bigX+bigW, bigY+bigH), (0, 255, 0), 2)
-        place_x = bigX - int(round(bigW/2)) - center_face_x
-        place_y = bigY - int(round(bigH/2)) - center_face_y
+    if big_x > -1:
+        cv2.rectangle(frame, (big_x, big_y), (big_x+big_w, big_y+big_h), (0, 255, 0), 2)
+        place_x = big_x - int(round(big_w/2)) - center_face_x
+        place_y = big_y - int(round(big_h/2)) - center_face_y
 
     # Convert ot PIL format
     frame_pil = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), 'RGB')
