@@ -24,6 +24,19 @@ def get_largest_face(faces):
             big_h = h
     return(big_x, big_y, big_w, big_h)
 
+def composite(frame_pil, maker, place_x, place_y):
+    place_x = int(round(place_x))
+    place_y = int(round(place_y))
+
+    if (place_x < 0):
+        maker = maker.crop((-1 * place_x, 0, maker.width - 1, maker.height - 1))
+        place_x = 0
+    if (place_y < 0):
+        maker = maker.crop((0, -1 * place_y, maker.width - 1, maker.height - 1))
+        place_y = 0
+
+    frame_pil.alpha_composite(maker, (place_x, place_y), (0,0))
+
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
 maker_man_raw = Image.open('Tampa MMF Man.png')
@@ -86,8 +99,7 @@ while True:
     # Add alpha channel
     frame_pil.putalpha(1)
 
-    if place_x > -1 and place_y > -1:
-        frame_pil.alpha_composite(maker_man_scaled, (int(round(place_x)), int(round(place_y))), (0,0))
+    composite(frame_pil, maker_man_scaled, place_x, place_y)
 
     # Display the resulting frame
     cv2.imshow('Video', cv2.cvtColor(np.asarray(frame_pil), cv2.COLOR_RGB2BGR))
