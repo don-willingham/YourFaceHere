@@ -24,6 +24,10 @@ def get_largest_face(faces):
             big_h = h
     return(big_x, big_y, big_w, big_h)
 
+# Referenced http://my.execpc.com/~steidl/robotics/first_order_lag_filter.html
+def lag(new, k, old):
+    return(k * new + ((1-k)*old))
+
 def composite(frame_pil, maker, place_x, place_y):
     place_x = int(round(place_x))
     place_y = int(round(place_y))
@@ -74,12 +78,9 @@ while True:
 
     # Draw a rectangle around the largest face
     if big_x > -1:
-        cv2.rectangle(frame, (big_x, big_y), (big_x+big_w, big_y+big_h), (0, 255, 0), 2)
-        cv2.rectangle(frame, (0, 0), (5, 5), (0, 0, 255), 2)
         center_you_x = int(round(big_x + big_w/2))
         center_you_y = int(round(big_y + big_h/2))
-        cv2.rectangle(frame, (center_you_x-1, center_you_y-1), (center_you_x+1, center_you_y+1), (255, 0, 0), 2)
-        scale_factor = big_h / face_height_raw
+        scale_factor = lag(((big_h / face_height_raw) + (big_w / face_width_raw)) / 2.0, 0.25, scale_factor)
         center_face_x = center_face_x_raw
         center_face_y = center_face_y_raw
         maker_man_scaled = maker_man_raw
@@ -98,7 +99,7 @@ while True:
     frame_pil = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), 'RGB')
     # Add alpha channel
     frame_pil.putalpha(1)
-
+    # Overlay maker man
     composite(frame_pil, maker_man_scaled, place_x, place_y)
 
     # Display the resulting frame
