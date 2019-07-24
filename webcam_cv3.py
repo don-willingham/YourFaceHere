@@ -27,8 +27,10 @@ def get_largest_face(faces):
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
 maker_man_raw = Image.open('Tampa MMF Man.png')
-center_face_x = 416 / 739
-center_face_y = 138 / 504
+center_face_x = 416
+center_face_y = 138
+face_width = 171
+face_height = 133
 scale_factor = 0.5
 if scale_factor > 1.01 or scale_factor < 0.99:
     maker_man_raw = maker_man_raw.resize((round(maker_man_raw.width*scale_factor), round(maker_man_raw.height*scale_factor)), Image.LANCZOS)
@@ -64,8 +66,12 @@ while True:
     # Draw a rectangle around the largest face
     if big_x > -1:
         cv2.rectangle(frame, (big_x, big_y), (big_x+big_w, big_y+big_h), (0, 255, 0), 2)
-        place_x = big_x - int(round(big_w/2)) - center_face_x
-        place_y = big_y - int(round(big_h/2)) - center_face_y
+        cv2.rectangle(frame, (0, 0), (5, 5), (0, 0, 255), 2)
+        center_you_x = int(round(big_x + big_w/2))
+        center_you_y = int(round(big_y + big_h/2))
+        cv2.rectangle(frame, (center_you_x-1, center_you_y-1), (center_you_x+1, center_you_y+1), (255, 0, 0), 2)
+        place_x = center_you_x - center_face_x
+        place_y = center_you_y - center_face_y
 
     # Convert ot PIL format
     frame_pil = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), 'RGB')
@@ -73,7 +79,7 @@ while True:
     frame_pil.putalpha(1)
 
     if place_x > -1 and place_y > -1:
-        frame_pil.alpha_composite(maker_man_raw, (place_x, place_y), (0,0))
+        frame_pil.alpha_composite(maker_man_raw, (int(round(place_x)), int(round(place_y))), (0,0))
 
     # Display the resulting frame
     cv2.imshow('Video', cv2.cvtColor(np.asarray(frame_pil), cv2.COLOR_RGB2BGR))
